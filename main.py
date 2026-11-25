@@ -1,29 +1,39 @@
 """One line: the single sentence that could have replaced an entire
 pointless meeting.
 
-Writes the line to /output/entry.txt (UTF-8, single line, 1-199 chars).
+Writes the line to /output/entry.txt (UTF-8, one line, 1-199 chars,
+trailing newline).
 """
 
 import os
 
 LINE = "This meeting could have been an email, but then nobody would have gotten to say 'let's circle back' with a straight face for forty-five minutes."
 
+OUTPUT_PATH = "/output/entry.txt"
+MIN_CHARS = 1
 MAX_CHARS = 199
 
 
-def main() -> None:
-    # Validate the line before writing anything, so a bad line never
-    # produces a partial or invalid /output/entry.txt.
+def build_line() -> str:
+    """Return the entry line, rejecting anything that is not one line."""
     line = LINE
     if not line.strip():
         raise ValueError("entry line must not be blank")
     if "\n" in line or "\r" in line:
         raise ValueError("entry line must be a single line")
-    if not 1 <= len(line) <= MAX_CHARS:
-        raise ValueError(f"entry line must be 1-{MAX_CHARS} chars, got {len(line)}")
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
-        f.write(line + "\n")
+    if not MIN_CHARS <= len(line) <= MAX_CHARS:
+        raise ValueError(
+            f"entry line must be {MIN_CHARS}-{MAX_CHARS} chars, "
+            f"got {len(line)}"
+        )
+    return line
+
+
+def main() -> None:
+    line = build_line()
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as handle:
+        handle.write(line + "\n")
 
 
 if __name__ == "__main__":
